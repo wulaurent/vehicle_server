@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import { CreateVehicleController } from "./controllers/create";
 
 import { VehicleStore } from "./store/vehicle";
 import { AppError } from "./errors";
@@ -12,6 +13,13 @@ app.use(express.json());
     const pool = await connectDb(dbConfig);
 
     const vehicleStore = new VehicleStore(pool);
+    const createVehicleController = new CreateVehicleController(vehicleStore);
+
+    app.post("/vehicles", (req, res, next) => {
+      createVehicleController
+        .handle(req, res)
+        .catch(next);
+    });
 
     app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
       if (err instanceof AppError) {
