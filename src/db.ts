@@ -26,7 +26,7 @@ interface DBConfig {
 
 export const dbConfig: DBConfig = {
   host: "localhost",
-  port: 5433,
+  port: 5434,
   database: "vehicle",
   user: "vehicle",
   password: "vehicle",
