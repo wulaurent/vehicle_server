@@ -34,4 +34,18 @@ export class VehicleStore {
       position: { latitude: row.latitude, longitude: row.longitude },
     };
   }
+
+  public async listVehicles(): Promise<Vehicle[]> {
+    const result = await this.pool.query(
+      `SELECT id, shortcode, battery, ST_X(position) AS longitude, ST_Y(position) AS latitude
+       FROM vehicle_server.vehicles`
+    );
+
+    return result.rows.map((row) => ({
+      id: row.id,
+      shortcode: row.shortcode,
+      battery: row.battery,
+      position: { longitude: row.longitude, latitude: row.latitude },
+    }));
+  }
 }
