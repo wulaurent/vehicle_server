@@ -72,4 +72,28 @@ program
     }
   });
 
+program
+  .command("delete-vehicle")
+  .description("Delete a vehicle by ID")
+  .requiredOption("--id <id>", "ID of the vehicle to delete", parseInt)
+  .action(async (options) => {
+    const { id } = options;
+    const { address } = program.opts(); // Utilise l'option globale pour récupérer l'adresse
+
+    const url = `http://${address}/vehicles/${id}`;
+
+    try {
+      await axios.delete(url);
+      console.log(`Vehicle with ID '${id}' deleted successfully.`);
+    } catch (error: any) {
+      if (error.response) {
+        console.error(
+          `Failed to delete vehicle: ${error.response.status} - ${JSON.stringify(error.response.data)}`
+        );
+      } else {
+        console.error(`Error: ${error.message}`);
+      }
+    }
+  });
+
 program.parse(process.argv);

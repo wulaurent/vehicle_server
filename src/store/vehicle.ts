@@ -48,4 +48,15 @@ export class VehicleStore {
       position: { longitude: row.longitude, latitude: row.latitude },
     }));
   }
+
+  public async deleteVehicle(id: number): Promise<void> {
+    const result = await this.pool.query(
+      `DELETE FROM vehicle_server.vehicles WHERE id = $1`,
+      [id]
+    );
+  
+    if (result.rowCount === 0) {
+      throw new Error(`Vehicle with ID ${id} does not exist.`);
+    }
+  }
 }
