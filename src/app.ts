@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { CreateVehicleController } from "./controllers/create";
+import { ListVehiclesController } from "./controllers/find";
 
 import { VehicleStore } from "./store/vehicle";
 import { AppError } from "./errors";
@@ -14,6 +15,7 @@ app.use(express.json());
 
     const vehicleStore = new VehicleStore(pool);
     const createVehicleController = new CreateVehicleController(vehicleStore);
+    const listVehiclesController = new ListVehiclesController(vehicleStore);
 
     app.post("/vehicles", (req, res, next) => {
       createVehicleController
@@ -21,6 +23,12 @@ app.use(express.json());
         .catch(next);
     });
 
+    app.get("/vehicles", (req, res, next) => {
+      listVehiclesController
+        .handle(req, res)
+        .catch(next);
+    });
+      
     app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
       if (err instanceof AppError) {
         res.status(400).json({ error: err.code, message: err.message, details: err.details });

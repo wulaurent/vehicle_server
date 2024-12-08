@@ -38,4 +38,38 @@ program
     }
   });
 
+program
+  .command("list-vehicles")
+  .description("List all vehicles")
+  .action(async () => {
+    const { address } = program.opts(); // Utilise l'option globale pour récupérer l'adresse
+
+    const url = `http://${address}/vehicles`;
+
+    try {
+      const response = await axios.get(url);
+      const vehicles = response.data;
+
+      if (vehicles.length === 0) {
+        console.log("No vehicles found.");
+        return;
+      }
+
+      console.log("Vehicles:");
+      vehicles.forEach((vehicle: any) => {
+        console.log(
+          `- ID: ${vehicle.id}, Shortcode: ${vehicle.shortcode}, Battery: ${vehicle.battery}, Position: Longitude ${vehicle.position.longitude}, Latitude ${vehicle.position.latitude}`
+        );
+      });
+    } catch (error: any) {
+      if (error.response) {
+        console.error(
+          `Failed to list vehicles: ${error.response.status} - ${JSON.stringify(error.response.data)}`
+        );
+      } else {
+        console.error(`Error: ${error.message}`);
+      }
+    }
+  });
+
 program.parse(process.argv);
