@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import axios from "axios";
+import axios, {AxiosResponse } from "axios";
 
 const program = new Command();
 
@@ -27,12 +27,14 @@ program
     const payload = { shortcode, battery, latitude, longitude };
 
     try {
-      const response = await axios.post(url, payload);
+      const response: AxiosResponse = await axios.post(url, payload);
       console.log(`Created vehicle '${shortcode}', with ID '${response.data.vehicle.id}'`);
-    } catch (error: any) {
-      if (error.response) {
-        console.error(`Failed to create vehicle: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
-      } else {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.error(
+          `Failed to create vehicle: ${error.response.status} - ${JSON.stringify(error.response.data)}`
+        );
+      } else if (error instanceof Error) {
         console.error(`Error: ${error.message}`);
       }
     }
@@ -42,13 +44,18 @@ program
   .command("list-vehicles")
   .description("List all vehicles")
   .action(async () => {
-    const { address } = program.opts(); // Utilise l'option globale pour récupérer l'adresse
+    const { address } = program.opts();
 
     const url = `http://${address}/vehicles`;
 
     try {
-      const response = await axios.get(url);
-      const vehicles = response.data;
+      const response: AxiosResponse = await axios.get(url);
+      const vehicles: Array<{
+        id: string;
+        shortcode: string;
+        battery: number;
+        position: { longitude: number; latitude: number };
+      }> = response.data;
 
       if (vehicles.length === 0) {
         console.log("No vehicles found.");
@@ -56,17 +63,17 @@ program
       }
 
       console.log("Vehicles:");
-      vehicles.forEach((vehicle: any) => {
+      vehicles.forEach((vehicle) => {
         console.log(
           `- ID: ${vehicle.id}, Shortcode: ${vehicle.shortcode}, Battery: ${vehicle.battery}, Position: Longitude ${vehicle.position.longitude}, Latitude ${vehicle.position.latitude}`
         );
       });
-    } catch (error: any) {
-      if (error.response) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
         console.error(
           `Failed to list vehicles: ${error.response.status} - ${JSON.stringify(error.response.data)}`
         );
-      } else {
+      } else if (error instanceof Error) {
         console.error(`Error: ${error.message}`);
       }
     }
@@ -78,19 +85,19 @@ program
   .requiredOption("--id <id>", "ID of the vehicle to delete", parseInt)
   .action(async (options) => {
     const { id } = options;
-    const { address } = program.opts(); // Utilise l'option globale pour récupérer l'adresse
+    const { address } = program.opts();
 
     const url = `http://${address}/vehicles/${id}`;
 
     try {
       await axios.delete(url);
       console.log(`Vehicle with ID '${id}' deleted successfully.`);
-    } catch (error: any) {
-      if (error.response) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
         console.error(
           `Failed to delete vehicle: ${error.response.status} - ${JSON.stringify(error.response.data)}`
         );
-      } else {
+      } else if (error instanceof Error) {
         console.error(`Error: ${error.message}`);
       }
     }
