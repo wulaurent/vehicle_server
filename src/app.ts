@@ -44,6 +44,8 @@ app.use(express.json());
         console.error(err);
         res.status(500).json({ error: "INTERNAL_ERROR", message: "Something went wrong" });
       }
+
+      next(err);
     });
   } catch (error) {
     console.error("Failed to start the server:", error);
