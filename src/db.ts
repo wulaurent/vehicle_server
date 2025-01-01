@@ -24,13 +24,16 @@ interface DBConfig {
   port: number;
 }
 
+const isDocker = process.env.IS_DOCKER === 'true';
+
 export const dbConfig: DBConfig = {
-  host: "localhost",
-  port: 5434,
-  database: "vehicle",
-  user: "vehicle",
-  password: "vehicle",
+  host: isDocker ? 'vehicle-database' : 'localhost',
+  port: isDocker ? 5432 : 5434,
+  user: 'vehicle',
+  password: 'vehicle',
+  database: 'vehicle'
 };
+
 
 export async function connectDb(cfg: DBConfig): Promise<pg.Pool> {
   const pool = new pg.Pool({

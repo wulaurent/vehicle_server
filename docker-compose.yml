@@ -1,0 +1,27 @@
+version: '3'
+services:
+  vehicle-database:
+    image: postgis/postgis:16-3.4-alpine
+    environment:
+      POSTGRES_USER: vehicle
+      POSTGRES_PASSWORD: vehicle
+      POSTGRES_DB: vehicle
+    ports:
+      - "5434:5432"
+    networks:
+      - vehicle-network
+
+  vehicle-server:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - vehicle-database
+    networks:
+      - vehicle-network
+
+networks:
+  vehicle-network:
+    driver: bridge
