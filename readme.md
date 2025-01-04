@@ -89,7 +89,7 @@ docker-compose up
 
 ## Utilisation
 
-### En local
+### Lancer l'outil en local
 Une fois le serveur lancés en local, dans un nouveau terminal, vous pouvez exécuter la CLI en utilisant les commandes suivantes
 
 1. Créer un véhicule :
