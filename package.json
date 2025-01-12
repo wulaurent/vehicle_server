@@ -12,7 +12,10 @@
     "start-db": "docker container run -d --name vehicle-database -e POSTGRES_USER=vehicle -e POSTGRES_PASSWORD=vehicle -e POSTGRES_DB=vehicle -p 5434:5432 postgis/postgis:16-3.4-alpine",
     "stop-db": "docker container rm -f vehicle-database",
     "lint": "eslint ./src",
-    "test": "jest"
+    "test": "jest",
+    "package": "docker build -t laurentwu1/vehicle-server:${TAG} .",
+    "publish": "docker image push laurentwu1/vehicle-server:${TAG}",
+    "release": "npm run package && npm run publish"
   },
   "repository": {
     "type": "git",

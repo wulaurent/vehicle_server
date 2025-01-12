@@ -66,7 +66,7 @@ Par exemple, pour lancer le serveur sur le port 3000 :
 npm run start 3000
 ```
 
-## Installation avec Docker
+## Installation avec Docker Compose
 
 ### 1. Cloner le projet
 Clonez le dépôt Git :
@@ -87,6 +87,26 @@ Lancez les conteneurs définis dans le fichier `docker-compose.yml` :
 docker-compose up
 ```
 
+## Installation avec Docker Hub
+
+### 1. Créer le réseau Docker
+Créez un réseau Docker :
+```bash
+docker network create vehicle-network
+```
+
+### 2. Lancer la base de données
+Exécutez un conteneur pour la base de données postgis sur le réseau Docker :
+```bash
+docker run -d --name vehicle-database --network vehicle-network -e POSTGRES_USER=vehicle -e POSTGRES_PASSWORD=vehicle -e POSTGRES_DB=vehicle -p 5434:5432 postgis/postgis:16-3.4-alpine
+```
+
+### 3. Démarrer le serveur
+Lancez le conteneur du serveur de l'application à partir de l'image taguée :
+```bash
+docker run -d --name vehicle_server-vehicle-server-1 --network vehicle-network -e IS_DOCKER=true laurentwu1/vehicle-server:v1.0.0
+```
+
 ## Utilisation
 
 ### Lancer l'outil en local
@@ -96,7 +116,6 @@ Une fois le serveur lancés en local, dans un nouveau terminal, vous pouvez exé
 ```bash
 vehicle-cli --address=localhost:8080 create-vehicle --shortcode=abcd --battery=12 --longitude=20.0 --latitude=30.0
 ```
-
 
 2. Lister les véhicules :
 ```bash
@@ -108,7 +127,7 @@ vehicle-cli --address=localhost:8080 list-vehicles
 vehicle-cli --address=localhost:8080 delete-vehicle --id <id_du_vehicule>
 ```
 
-### Lancer l'outil via Docker
+### Lancer l'outil via Docker Compose / Docker Hub
 Une fois les conteneurs démarrés, vous pouvez exécuter la CLI en utilisant les commandes suivantes
 
 1. Créer un véhicule :
@@ -125,6 +144,8 @@ docker exec -it vehicle_server-vehicle-server-1 vehicle-cli --address=localhost:
 ```bash
 docker exec -it vehicle_server-vehicle-server-1 vehicle-cli --address=localhost:8080 delete-vehicle --id <id_du_vehicule>
 ```
+
+### Lancer l'outil via Docker Hub
 
 ## Contributeurs
 - **[Laurent WU](https://github.com/wulaurent)**
